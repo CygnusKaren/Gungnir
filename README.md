@@ -10,6 +10,8 @@ ChatGPTを駆使した我流Vive Codingスタイルです
 project_dsl.rbとgungnir_dsl.rbを解読してほしい
 別リポジトリには実用ケースがあるので、それも見てほしい
 
+## DSL検証について
+gungnir_dsl.rbを単独で起動して検証してください
 
 ## 由来について
 北欧神話のグングニルと言えればかっこいいが
