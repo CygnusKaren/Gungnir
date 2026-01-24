@@ -4,6 +4,8 @@ require 'bundler/setup'
 require 'listen'
 require 'set'
 require 'optparse'
+require 'open3'
+require_relative 'gungnir_dsl'
 
 # mutexed
 pending = Set.new
@@ -24,7 +26,7 @@ p ARGV
 puts params
 
 # listen
-listener = Listen.to('./') do |modified, added, removed|
+listener = Listen.to('./',only: /\.dat$|\.png$/) do |modified, added, removed|
   # デバッグ出力（そのまま残す）
   puts "変更: #{modified}" unless modified.empty?
   puts "追加: #{added}"    unless added.empty?
@@ -41,11 +43,13 @@ end
 
 listener.start
 puts "Monitor Start..."
-
+index = fileIndex()
+export = exportPath()
+# pp index
 # debounce worker
 worker = Thread.new do
   while running
-    sleep 3   # Samba対策の要
+    sleep 5   # Samba対策の要
     files = nil
 
     mutex.synchronize do
@@ -54,11 +58,38 @@ worker = Thread.new do
     end
 
     next if files.empty?
-
+    puts "処理開始"
     puts "まとめて処理: #{files}"
-
-    case params['m']
+    
+    case params['m'] # 引数"m"とオプション
     when 'build'
+      #puts "ターゲット: #{files}"
+      # インデックスを走査する
+      files.each do | file |
+        file = File.basename(file)
+        if index[file] # インデックスへの確認
+          # 該当あり
+          pp index[file] # 該当プロジェクトデータを出力
+          index[file].each do  |pak| # プロジェクトデータの切り出し
+            exportPath = "#{export}#{pak.pak_file}"
+            puts "Target:#{file} -> Project:#{pak.name}" # 更新ファイルとプロジェクトの紐付け
+            puts "ExportPath: #{exportPath}" # 出力ファイル名の出力
+            cmd = [
+              "makeobj_60-5",
+              "pak",
+              exportPath,
+              *pak.dat_files
+            ]
+            stdout , stderr, status = Open3.capture3(*cmd)
+          end
+
+          # 
+          
+        else
+          # 該当無し
+            puts "Target:#{file} -> Project not found."
+        end
+      end
       # system("makeobj ...")
     when 'watch'
     # watch 専用処理
@@ -66,6 +97,7 @@ worker = Thread.new do
     else
       # default
     end
+    puts "========================"
   end
 end
 
