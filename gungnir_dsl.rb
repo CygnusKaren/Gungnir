@@ -25,6 +25,14 @@ class Project
     pak.instance_eval(&block) if block_given?
     @paks << pak
   end
+
+  def pakEach(list,prefix:,&block)
+    list.each do |v|
+      pakName "#{prefix}-#{v}" do
+        instance_exec(v, &block)  # ブロックに v を渡す
+      end
+    end
+  end
 end
 
 class Pak # pak単独クラス
@@ -80,11 +88,11 @@ puts "=========================="
     @file_to_paks[f] ||= []
     @file_to_paks[f] << pak
   end
-  # puts "Pak: #{pak.name}"
-  # puts "  pak: #{pak.pak_file}"
-  # puts "  dat: #{pak.dat_files.join(', ')}"
-  # puts "  png: #{pak.png_files.join(', ')}"
-  # puts "=========================="
+  puts "Pak: #{pak.name}"
+  puts "  pak: #{pak.pak_file}"
+  puts "  dat: #{pak.dat_files.join(', ')}"
+  puts "  png: #{pak.png_files.join(', ')}"
+  puts "=========================="
 end
 
 def fileIndex
