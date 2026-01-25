@@ -20,9 +20,5 @@ def build_project
     end
   end
 end
-    # FENCE_POS := FB  FR LB LR RB FL
-    # FENCE_ANGLE_PAKS := \
-	# $(foreach v,$(FENCE_POS), \
-	#          $(DIR)building.YIC-railstop-platform-1_Diagonal\(Angle-Fence-$(v)\).pak)
-    
+
 #end
