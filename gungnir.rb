@@ -81,6 +81,12 @@ worker = Thread.new do
               *pak.dat_files
             ]
             stdout , stderr, status = Open3.capture3(*cmd)
+            # 標準出力
+            puts stdout
+            # エラー
+            puts stderr
+            # status
+            puts stats
           end
 
           # 
