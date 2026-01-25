@@ -63,20 +63,25 @@ class Pak # pak単独クラス
   end
 end
 
-# DSLファイルを読み込む
-# 作業ディレクトリ側の DSL を読む
-dsl_file = File.join(Dir.pwd, 'project_dsl.rb')
-
-unless File.exist?(dsl_file)
-  abort "project_dsl.rb が見つかりません: #{dsl_file}"
+def loadDSL
+  # DSLファイルを読み込む
+  # 作業ディレクトリ側の DSL を読む
+  dsl_file = File.join(Dir.pwd, 'project_dsl.rb')
+  
+  unless File.exist?(dsl_file)
+    abort "project_dsl.rb が見つかりません: #{dsl_file}"
+  end
+  Object.send(:remove_const, :Gungnir_DSL) if defined?(Gungnir_DSL)
+  load dsl_file  
 end
-require dsl_file
 
+# dslファイルをロードする
+loadDSL
 # 逆引き用のインデックスを作る
 @file_to_paks = {}
 
 # 出力確認
-@proj = build_project()
+@proj = Gungnir_DSL.build_project()
 
 # 共通・基本項目
 puts "Common: #{@proj.common_files.join(',')}"

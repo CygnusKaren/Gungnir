@@ -26,17 +26,17 @@ p ARGV
 puts params
 
 # listen
-listener = Listen.to('./',only: /\.dat$|\.png$/) do |modified, added, removed|
+listener = Listen.to('./',only: /\.dat$|\.png|\.rb$/) do |modified, added, removed|
   # デバッグ出力（そのまま残す）
   puts "変更: #{modified}" unless modified.empty?
   puts "追加: #{added}"    unless added.empty?
   puts "削除: #{removed}"  unless removed.empty?
-
+  
   # デバウンス用キューに積む
   mutex.synchronize do
-    (modified + added + removed).each do |path|
-      next if File.directory?(path)
-      pending << path
+    (modified + added + removed).each do |path| # イベントを一括で配列化
+      next if File.directory?(path) # ディレクトリは飛ばす
+         pending << path
     end
   end
 end
@@ -66,13 +66,21 @@ worker = Thread.new do
       #puts "ターゲット: #{files}"
       # インデックスを走査する
       files.each do | file |
-        file = File.basename(file)
-        if index[file] # インデックスへの確認
+        b_file = File.basename(file)
+
+        # DSL定義かどうかを判定
+        if File.extname(file) == ".rb"
+          puts "DSLファイルが更新されました"
+          loadDSL
+          next
+        end
+        
+        if index[b_file] # インデックスへの確認
           # 該当あり
-          pp index[file] # 該当プロジェクトデータを出力
-          index[file].each do  |pak| # プロジェクトデータの切り出し
+          pp index[b_file] # 該当プロジェクトデータを出力
+          index[b_file].each do  |pak| # プロジェクトデータの切り出し
             exportPath = "#{export}#{pak.pak_file}"
-            puts "Target:#{file} -> Project:#{pak.name}" # 更新ファイルとプロジェクトの紐付け
+            puts "Target:#{b_file} -> Project:#{pak.name}" # 更新ファイルとプロジェクトの紐付け
             puts "ExportPath: #{exportPath}" # 出力ファイル名の出力
             cmd = [
               "makeobj_60-5",
@@ -86,11 +94,8 @@ worker = Thread.new do
             # エラー
             puts stderr
             # status
-            puts stats
+            puts status
           end
-
-          # 
-          
         else
           # 該当無し
             puts "Target:#{file} -> Project not found."
