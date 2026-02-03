@@ -72,6 +72,8 @@ worker = Thread.new do
         if File.extname(file) == ".rb"
           puts "DSLファイルが更新されました"
           loadDSL
+          index = fileIndex()
+          export = exportPath()
           next
         end
         
