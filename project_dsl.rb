@@ -19,6 +19,13 @@ module Gungnir_DSL
         dat "SampleAddon_#{pos}.dat"
         png "SampleAddon#{pos}.png", "Sample2.png"
       end
+
+      pakName "DirectorySampleAddon" do
+        dir "tester"
+        pak "building.SampleAddon.pak"
+        dat "SampleAddon.dat"
+        png "SampleAddon.png", "Sample2.png"
+      end
     end
   end
 end
