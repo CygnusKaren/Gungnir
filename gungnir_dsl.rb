@@ -1,5 +1,23 @@
 #!/usr/bin/env ruby
+# bundler gem
 
+require 'bundler/setup'
+
+# デバッグ用オプション
+params = {}
+unless defined?(OptionParser)
+  require 'optparse'
+  opts = OptionParser.new
+  opts.on('-d MODE') { |v|
+    params['d'] = v
+  }
+  opts.parse!(ARGV)
+  
+  # p ARGV
+  # puts params  
+end
+require 'optparse'
+require 'open3'
 # DSL定義部分
 class Project
   attr_reader :name, :paks, :common_files, :export_path
@@ -20,15 +38,17 @@ class Project
     @export_path = path
   end
   
-  def pakName(name, &block) # pak1個のプロパティを入力
+  def pakName(name, dir: "./", &block) # pak1個のプロパティを入力
     pak = Pak.new(name)
     pak.instance_eval(&block) if block_given?
     @paks << pak
   end
 
-  def pakEach(list,prefix:,&block)
+  def pakEach(list,prefix:,&block) # 複数のpakを一括定義する
+    # listで変化部
+    # prefix: 変数の接頭辞(必須)
     list.each do |v|
-      pakName "#{prefix}-#{v}" do
+      pakName "#{prefix}-#{v}" do # paknameは内部参照用として割り切る、prefix + 方向で定義
         instance_exec(v, &block)  # ブロックに v を渡す
       end
     end
@@ -37,29 +57,34 @@ class Project
 end
 
 class Pak # pak単独クラス
-  attr_accessor :name, :pak_file, :dat_files, :png_files 
+  attr_accessor :name, :pak_file, :dat_files, :png_files, :file_dirs
 
   def initialize(name) # 初期化 pak関連のデータを受け入れる
     @name = name
     @type_status = nil
     @dat_files = []
     @png_files = []
+    @file_dirs = "./"
   end
 
-  def type(type)
+  def type(type) # addon type
     @type_status = type
   end
   
-  def pak(file) 
+  def pak(file) # pakname
     @pak_file = file
   end
 
-  def dat(*files)
+  def dat(*files) # using dat file
     @dat_files.concat(files)
   end
 
-  def png(*files)
+  def png(*files) # using png image
     @png_files.concat(files)
+  end
+
+  def dir(dir)
+    @file_dirs = dir
   end
 end
 
@@ -94,11 +119,15 @@ puts "=========================="
     @file_to_paks[f] ||= []
     @file_to_paks[f] << pak
   end
-  # puts "Pak: #{pak.name}"
-  # puts "  pak: #{pak.pak_file}"
-  # puts "  dat: #{pak.dat_files.join(', ')}"
-  # puts "  png: #{pak.png_files.join(', ')}"
-  # puts "=========================="
+  case params['d']
+  when 'debug'
+  puts "Pak: #{pak.name}"
+  puts "  pak: #{pak.pak_file}"
+  puts "  dat: #{pak.dat_files.join(', ')}"
+  puts "  png: #{pak.png_files.join(', ')}"
+  puts "  dir: #{pak.file_dirs}"
+  puts "=========================="
+  end
 end
 
 def fileIndex
