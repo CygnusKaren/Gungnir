@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 # bundler gem
-
 require 'bundler/setup'
 
 # デバッグ用オプション
@@ -18,6 +17,7 @@ unless defined?(OptionParser)
 end
 require 'optparse'
 require 'open3'
+
 # DSL定義部分
 class Project
   attr_reader :name, :paks, :common_files, :export_path
@@ -44,7 +44,7 @@ class Project
     @paks << pak
   end
 
-  def pakEach(list,prefix:,&block) # 複数のpakを一括定義する
+  def pakEach(list,prefix:, dir: "./", &block) # 複数のpakを一括定義する
     # listで変化部
     # prefix: 変数の接頭辞(必須)
     list.each do |v|

@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+ROOT = File.expand_path('..', __dir__)
+ENV['BUNDLE_GEMFILE'] ||= File.join(ROOT, 'Gemfile')
+
+require 'bundler/setup'
+load File.join(ROOT, 'gungnir_dsl.rb')
