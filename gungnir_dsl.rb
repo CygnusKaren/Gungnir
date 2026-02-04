@@ -20,7 +20,7 @@ require 'open3'
 
 # DSL定義部分
 class Project
-  attr_reader :name, :paks, :common_files, :export_path
+  attr_reader :name, :paks, :common_files, :export_path, :file_dirs
 
   def initialize(name, &block) # 初期化 プロジェクト名を受け入れる
     @name = name # プロジェクト名
@@ -38,6 +38,10 @@ class Project
     @export_path = path
   end
   
+  def workingDir(dir) # 共通ファイル取り込み
+    @working_dir = dir
+  end
+
   def pakName(name, dir: "./", &block) # pak1個のプロパティを入力
     pak = Pak.new(name)
     pak.instance_eval(&block) if block_given?
