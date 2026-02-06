@@ -17,3 +17,11 @@ gungnir_dsl.rbを単独で起動して検証してください
 北欧神話のグングニルと言えればかっこいいが
 アサルトリリィという作品に登場する同名の武器を由来としてる
 →https://w.atwiki.jp/assault_lily/pages/283.html
+
+## ドキュメントの生成
+YARDを使用してドキュメントを生成できます。
+```bash
+bundle install
+bundle exec rake yard
+```
+生成されたドキュメントは `doc/` ディレクトリ配下に出力されます。

@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
+# @title Gungnir Main Runner
+# @author riri
+# Simutransのアドオン制作を支援するツール。
+# ファイルの変更を監視し、必要に応じてmakeobjを実行してpak化を行います。
 # bundler gem
 require 'bundler/setup'
 require 'listen'
@@ -50,6 +54,8 @@ export = exportPath()
 worker = Thread.new do
   while running
     sleep 5   # Samba対策の要
+
+    
     files = nil
 
     mutex.synchronize do
@@ -62,8 +68,6 @@ worker = Thread.new do
     puts "まとめて処理: #{files}"
 
     # DSLファイルの更新チェック 
-
-
     # メイン処理
     @cmd = []
     files.each do | file |

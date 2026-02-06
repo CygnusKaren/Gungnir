@@ -1,5 +1,7 @@
-# project.dsl.rb
+# プロジェクト固有の定義を行うモジュール
 module Gungnir_DSL
+  # プロジェクトの構成を構築する
+  # @return [Project] 構築されたプロジェクトオブジェクト
   def self.build_project
     Project.new("SampleProject") do
       commonFiles "SampleIcons.png"
